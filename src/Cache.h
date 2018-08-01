@@ -24,43 +24,75 @@
 
 namespace tigl
 {
-    template <typename CacheStruct, typename CpacsClass>
-    class Cache
-    {
-    public:
-        typedef void(CpacsClass::* BuildFunc)(CacheStruct&) const;
+	template <typename T>
+	class ScopeLockedReference {
+	public:
+		ScopeLockedReference(T& reference, boost::mutex& mutex)
+			: m_reference(reference), m_mutex(mutex)
+		{
+		}
 
-        Cache(CpacsClass& instance, BuildFunc buildFunc)
-            : m_instance(instance), m_buildFunc(buildFunc)
-        {
-        }
+		~ScopeLockedReference() {
+			m_mutex.unlock();
+		}
 
-        const CacheStruct& value() const
-        {
+		ScopeLockedReference(ScopeLockedReference&&) = default;
+
+		T& operator*() const { return m_reference; }
+		T* operator->() const { return &m_reference; }
+
+	private:
+		T& m_reference;
+		boost::mutex& m_mutex;
+	};
+
+	template <typename CacheStruct, typename CpacsClass>
+	class Cache
+	{
+	public:
+		typedef void(CpacsClass::* BuildFunc)(CacheStruct&) const;
+
+		Cache(CpacsClass& instance, BuildFunc buildFunc)
+			: m_instance(instance), m_buildFunc(buildFunc)
+		{
+		}
+
+		// constructs the cache and gives direct access to it
+		// the access is guarded for the lifetime of the returned ScopeLockedReference
+		// prefer to rely on the build function for updating the cache
+		ScopeLockedReference<CacheStruct> writeAccess() {
+			boost::unique_lock<boost::mutex> lock(m_mutex);
+			if (!m_cache)
+				m_cache.emplace();
+			return ScopeLockedReference<CacheStruct>(*m_cache, *lock.release());
+		}
+
+		const CacheStruct& value() const
+		{
             //boost::lock_guard<CheckedMutex> guard(m_mutex);
-            boost::lock_guard<boost::mutex> guard(m_mutex);
-            if (!m_cache) {
-                m_cache.emplace();
-                (m_instance.*m_buildFunc)(*m_cache);
-            }
-            return m_cache.value();
-        }
+			boost::lock_guard<boost::mutex> guard(m_mutex);
+			if (!m_cache) {
+				m_cache.emplace();
+				(m_instance.*m_buildFunc)(*m_cache);
+			}
+			return m_cache.value();
+		}
 
-        const CacheStruct& operator*() const { return value(); }
-        const CacheStruct* operator->() const { return &value(); }
+		const CacheStruct& operator*() const { return value(); }
+		const CacheStruct* operator->() const { return &value(); }
 
-        void clear()
-        {
+		void clear()
+		{
             //boost::lock_guard<CheckedMutex> guard(m_mutex);
-            boost::lock_guard<boost::mutex> guard(m_mutex);
-            m_cache = boost::none;
-        }
+			boost::lock_guard<boost::mutex> guard(m_mutex);
+			m_cache = boost::none;
+		}
 
-    private:
-        CpacsClass& m_instance;
-        BuildFunc m_buildFunc;
+	private:
+		CpacsClass& m_instance;
+		BuildFunc m_buildFunc;
         //mutable CheckedMutex m_mutex;
-        mutable boost::mutex m_mutex;
-        mutable boost::optional<CacheStruct> m_cache;
-    };
+		mutable boost::mutex m_mutex;
+		mutable boost::optional<CacheStruct> m_cache;
+	};
 }

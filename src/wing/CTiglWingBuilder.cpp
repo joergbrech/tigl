@@ -49,7 +49,7 @@ Standard_Boolean CreateSideCap(const TopoDS_Wire& W,
                                const Standard_Real presPln,
                                TopoDS_Face& theFace);
 
-CTiglWingBuilder::CTiglWingBuilder(CCPACSWing& wing)
+CTiglWingBuilder::CTiglWingBuilder(const CCPACSWing& wing)
     : _wing(wing)
 {
 }
@@ -57,10 +57,10 @@ CTiglWingBuilder::CTiglWingBuilder(CCPACSWing& wing)
 #ifndef NO_EXPLICIT_TE_MODELING
 PNamedShape CTiglWingBuilder::BuildShape()
 {
-    CCPACSWingSegments& segments = _wing.m_segments;
+    const CCPACSWingSegments& segments = _wing.m_segments;
 
     // check whether we have a blunt TE or not
-    CCPACSWingProfile& innerProfile = segments.GetSegment(1).GetInnerConnection().GetProfile();
+    const CCPACSWingProfile& innerProfile = segments.GetSegment(1).GetInnerConnection().GetProfile();
 
     TopoDS_Compound guideCurves = _wing.GetGuideCurveWires();
 

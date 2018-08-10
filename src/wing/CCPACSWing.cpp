@@ -313,11 +313,11 @@ TopoDS_Shape & CCPACSWing::GetLowerShape()
     
 
 // get short name for loft
-std::string CCPACSWing::GetShortShapeName() 
+std::string CCPACSWing::GetShortShapeName() const
 {
     unsigned int windex = 0;
     for (int i = 1; i <= GetConfiguration().GetWingCount(); ++i) {
-        tigl::CCPACSWing& w = GetConfiguration().GetWing(i);
+        const CCPACSWing& w = GetConfiguration().GetWing(i);
         if (GetUID() == w.GetUID()) {
             windex = i;
             std::stringstream shortName;
@@ -335,7 +335,7 @@ PNamedShape CCPACSWing::BuildLoft()
 }
 
 // Builds a fused shape of all wing segments
-PNamedShape CCPACSWing::BuildFusedSegments(bool splitWingInUpperAndLower)
+PNamedShape CCPACSWing::BuildFusedSegments(bool splitWingInUpperAndLower) const
 {
     PNamedShape loft = CTiglWingBuilder(*this);
     return loft;

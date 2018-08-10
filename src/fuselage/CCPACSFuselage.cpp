@@ -173,7 +173,7 @@ CCPACSFuselageSegment& CCPACSFuselage::GetSegment(std::string uid)
 }
 
 // get short name for loft
-std::string CCPACSFuselage::GetShortShapeName ()
+std::string CCPACSFuselage::GetShortShapeName () const
 {
     unsigned int findex = 0;
     for (int i = 1; i <= GetConfiguration().GetFuselageCount(); ++i) {
@@ -188,7 +188,7 @@ std::string CCPACSFuselage::GetShortShapeName ()
     return "UNKNOWN";
 }
 
-void CCPACSFuselage::SetFaceTraits (PNamedShape loft, bool hasSymmetryPlane, bool smoothSurface)
+void CCPACSFuselage::SetFaceTraits (PNamedShape loft, bool hasSymmetryPlane, bool smoothSurface) const
 {
     // TODO: Face traits with guides must be made
     // this is currently only valid without guides

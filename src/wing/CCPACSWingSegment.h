@@ -242,7 +242,7 @@ private:
     };
 
     // get short name for loft
-    std::string GetShortShapeName ();
+    std::string GetShortShapeName () const;
 
     // Builds upper and lower surfaces
     void MakeSurfaces(SurfaceCache& cache) const;

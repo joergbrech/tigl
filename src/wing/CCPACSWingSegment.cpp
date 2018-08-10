@@ -399,16 +399,16 @@ TopoDS_Shape CCPACSWingSegment::GetOuterClosure(TiglCoordinateSystem referenceCS
 }
 
 // get short name for loft
-std::string CCPACSWingSegment::GetShortShapeName () 
+std::string CCPACSWingSegment::GetShortShapeName () const
 {
     unsigned int windex = 0;
     unsigned int wsindex = 0;
     for (int i = 1; i <= wing->GetConfiguration().GetWingCount(); ++i) {
-        tigl::CCPACSWing& w = wing->GetConfiguration().GetWing(i);
+        const CCPACSWing& w = wing->GetConfiguration().GetWing(i);
         if (wing->GetUID() == w.GetUID()) {
             windex = i;
             for (int j = 1; j <= w.GetSegmentCount(); j++) {
-                CCPACSWingSegment& ws = w.GetSegment(j);
+                const CCPACSWingSegment& ws = w.GetSegment(j);
                 if (GetUID() == ws.GetUID()) {
                     wsindex = j;
                     std::stringstream shortName;
@@ -435,13 +435,13 @@ PNamedShape CCPACSWingSegment::BuildLoft()
     
 
     if (m_guideCurves) {
-        CCPACSGuideCurves& curves = *m_guideCurves;
+        const CCPACSGuideCurves& curves = *m_guideCurves;
         bool hasTrailingEdge = !innerConnection.GetProfile().GetTrailingEdge().IsNull();
         
         // order guide curves according to fromRelativeCircumeference
-        std::multimap<double, CCPACSGuideCurve*> guideMap;
+        std::multimap<double, const CCPACSGuideCurve*> guideMap;
         for (int iguide = 1; iguide <= curves.GetGuideCurveCount(); ++iguide) {
-            CCPACSGuideCurve* curve = &curves.GetGuideCurve(iguide);
+            const CCPACSGuideCurve* curve = &curves.GetGuideCurve(iguide);
             double value = *(curve->GetFromRelativeCircumference_choice2());
             if (value >= 1. && !hasTrailingEdge) {
                 // this is a trailing edge profile, we should add it first
@@ -450,9 +450,9 @@ PNamedShape CCPACSWingSegment::BuildLoft()
             guideMap.insert(std::make_pair(value, curve));
         }
         
-        std::multimap<double, CCPACSGuideCurve*>::iterator it;
+        std::multimap<double, const CCPACSGuideCurve*>::iterator it;
         for (it = guideMap.begin(); it != guideMap.end(); ++it) {
-            CCPACSGuideCurve* curve = it->second;
+            const CCPACSGuideCurve* curve = it->second;
             BRepBuilderAPI_MakeWire wireMaker(curve->GetCurve());
             lofter.addGuides(wireMaker.Wire());
         }

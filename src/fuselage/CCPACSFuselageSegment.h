@@ -170,7 +170,7 @@ private:
     void UpdateShapeCache() const;
 
     // Builds the loft between the two segment sections
-    PNamedShape BuildLoft() OVERRIDE;
+    PNamedShape BuildLoft() const OVERRIDE;
 
     void UpdateSurfaceProperties(SurfacePropertiesCache& cache) const;
 

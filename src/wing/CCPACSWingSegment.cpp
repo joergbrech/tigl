@@ -423,7 +423,7 @@ std::string CCPACSWingSegment::GetShortShapeName () const
 
 // Builds the loft between the two segment sections
 // build loft out of faces (for compatibility with component segmen loft)
-PNamedShape CCPACSWingSegment::BuildLoft()
+PNamedShape CCPACSWingSegment::BuildLoft() const
 {
     TopoDS_Wire innerWire = GetInnerWire();
     TopoDS_Wire outerWire = GetOuterWire();

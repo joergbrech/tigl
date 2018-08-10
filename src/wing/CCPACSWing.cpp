@@ -329,7 +329,7 @@ std::string CCPACSWing::GetShortShapeName() const
 }
 
 // build loft
-PNamedShape CCPACSWing::BuildLoft()
+PNamedShape CCPACSWing::BuildLoft() const
 {
     return BuildFusedSegments(true);
 }

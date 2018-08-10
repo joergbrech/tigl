@@ -81,7 +81,7 @@ CCPACSFuselage::~CCPACSFuselage()
 // Invalidates internal state
 void CCPACSFuselage::Invalidate()
 {
-    loft.reset();
+    loft.clear();
     guideCurves.clear();
     m_segments.Invalidate();
     if (m_positionings)
@@ -226,7 +226,7 @@ void CCPACSFuselage::SetFaceTraits (PNamedShape loft, bool hasSymmetryPlane, boo
 }
 
 // Builds a fused shape of all fuselage segments
-PNamedShape CCPACSFuselage::BuildLoft()
+PNamedShape CCPACSFuselage::BuildLoft() const
 {
     // Get Continuity of first segment
     // TODO: adapt lofting to have multiple different continuities

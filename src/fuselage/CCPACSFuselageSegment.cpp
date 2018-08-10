@@ -282,7 +282,7 @@ void CCPACSFuselageSegment::SetFaceTraits (PNamedShape loft, bool hasSymmetryPla
 }
 
 // Builds the loft between the two segment sections
-PNamedShape CCPACSFuselageSegment::BuildLoft()
+PNamedShape CCPACSFuselageSegment::BuildLoft() const
 {
     // Build loft
     //BRepOffsetAPI_ThruSections generator(Standard_False, Standard_False, Precision::Confusion());

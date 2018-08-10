@@ -157,7 +157,12 @@ public:
 
     TIGL_EXPORT TiglGeometricComponentType GetComponentType() const OVERRIDE { return TIGL_COMPONENT_FUSELSEGMENT | TIGL_COMPONENT_SEGMENT | TIGL_COMPONENT_LOGICAL; }
 
-protected:
+private:
+    struct SurfacePropertiesCache {
+        double myVolume;      ///< Volume of this segment
+        double mySurfaceArea; ///< Surface Area of this segment
+    };
+
     // Cleanup routine
     void Cleanup();
 
@@ -167,18 +172,18 @@ protected:
     // Builds the loft between the two segment sections
     PNamedShape BuildLoft() OVERRIDE;
 
-    void SetFaceTraits(PNamedShape loft, bool hasSymmetryPlane);
+    void UpdateSurfaceProperties(SurfacePropertiesCache& cache) const;
+
+    void SetFaceTraits(PNamedShape loft, bool hasSymmetryPlane) const;
 
 private:
     // get short name for loft
-    std::string GetShortShapeName();
+    std::string GetShortShapeName() const;
 
     CTiglFuselageConnection startConnection;       /**< Start segment connection                */
     CTiglFuselageConnection endConnection;         /**< End segment connection                  */
     CCPACSFuselage*         fuselage;             /**< Parent fuselage                         */
-    double                  myVolume;             /**< Volume of this segment                  */
-    double                  mySurfaceArea;        /**< Surface Area of this segment            */
-
+    Cache<SurfacePropertiesCache, CCPACSFuselageSegment> surfacePropertiesCache;
     unique_ptr<IGuideCurveBuilder> m_guideCurveBuilder;
 };
 

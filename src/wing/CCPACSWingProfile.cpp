@@ -61,8 +61,11 @@ namespace tigl
 
 // Constructor
 CCPACSWingProfile::CCPACSWingProfile(CTiglUIDManager* uidMgr)
-    : generated::CPACSProfileGeometry(uidMgr), isRotorProfile(false) {}
-
+    : generated::CPACSProfileGeometry(uidMgr)
+    , isRotorProfile(false)
+    , pointListAlgo(*this, &CCPACSWingProfile::buildPointListAlgo)
+{
+}
 
 CCPACSWingProfile::~CCPACSWingProfile() {}
 
@@ -317,13 +320,16 @@ Handle(Geom2d_TrimmedCurve) CCPACSWingProfile::GetChordLine() const
     return chordLine;
 }
 
+void CCPACSWingProfile::buildPointListAlgo(unique_ptr<CTiglWingProfilePointList>& cache) const
+{
+    cache.reset(new CTiglWingProfilePointList(*this, const_cast<CCPACSPointListXYZ&>(*m_pointList_choice1))); // FIXME(bgruber)
+}
+
 ITiglWingProfileAlgo* CCPACSWingProfile::GetProfileAlgo()
 {
     if (m_pointList_choice1) {
         // in case the wing profile algorithm is a point list, create the additional algorithm instance
-        if (!pointListAlgo)
-            pointListAlgo.reset(new CTiglWingProfilePointList(*this, *m_pointList_choice1));
-        return &*pointListAlgo;
+        return &**pointListAlgo;
     } else if (m_cst2D_choice2) {
         return &*m_cst2D_choice2;
     } else {
